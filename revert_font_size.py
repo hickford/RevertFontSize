@@ -11,10 +11,7 @@ def is_sublime_text_3():
 def plugin_loaded():
     """Called when this plugin is loaded; Sublime Text 3 API."""
     preferences = sublime.load_settings("Preferences.sublime-settings")
-    if not preferences.get("revert_font_size"):
-        default_font_size = preferences.get("font_size", 10)
-        preferences.set("revert_font_size", default_font_size)
-        sublime.save_settings("Preferences.sublime-settings")
+    RevertFontSizeCommand.original_font_size = preferences.get("font_size", 10) # record font size at plugin load
 
 def plugin_unloaded():
     """Called when this plugin is unloaded; Sublime Text 3 API."""
@@ -26,9 +23,11 @@ class RevertFontSizeCommand(sublime_plugin.ApplicationCommand):
     Based on code by bizoo
     http://www.sublimetext.com/forum/viewtopic.php?f=3&t=9508
     """
+    original_font_size = 10
+
     def run(self):
         preferences = sublime.load_settings("Preferences.sublime-settings")
-        revert_font_size = preferences.get("revert_font_size", 10)    # value 10 is the fallback, just in case
+        revert_font_size = preferences.get("revert_font_size", self.original_font_size) # fallback to original font size at plugin load
         preferences.set("font_size", revert_font_size)
         sublime.save_settings("Preferences.sublime-settings")
 
